@@ -45,12 +45,7 @@
                   </select>
                 </div>
                 <button class="calendar-button" id="start-calendar-btn">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ad2a24" stroke-width="2">
-                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                    <line x1="16" y1="2" x2="16" y2="6"></line>
-                    <line x1="8" y1="2" x2="8" y2="6"></line>
-                    <line x1="3" y1="10" x2="21" y2="10"></line>
-                  </svg>
+                  <span>📅</span> Pick Date
                 </button>
               </div>
             </div>
@@ -82,12 +77,7 @@
                   </select>
                 </div>
                 <button class="calendar-button" id="end-calendar-btn">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ad2a24" stroke-width="2">
-                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                    <line x1="16" y1="2" x2="16" y2="6"></line>
-                    <line x1="8" y1="2" x2="8" y2="6"></line>
-                    <line x1="3" y1="10" x2="21" y2="10"></line>
-                  </svg>
+                  <span>📅</span> Pick Date
                 </button>
               </div>
             </div>
@@ -127,10 +117,10 @@
         </div>
       `;
 
-      // Add CSS
+      // Add CSS - All selectors now properly scoped to the container
       const style = document.createElement('style');
       style.textContent = `
-        .day-calculator {
+        #DayCalculatorContainer .day-calculator {
           font-family: Arial, sans-serif;
           background: white;
           padding: 20px;
@@ -140,18 +130,18 @@
           max-width: 100%;
         }
         
-        .calculator-title {
+        #DayCalculatorContainer .calculator-title {
           color: #ad2a24;
           margin: 0 0 15px 0;
           font-size: 1.4rem;
           text-align: center;
         }
         
-        .input-section {
+        #DayCalculatorContainer .input-section {
           margin-bottom: 15px;
         }
         
-        .date-row {
+        #DayCalculatorContainer .date-row {
           display: flex;
           align-items: center;
           margin-bottom: 10px;
@@ -159,28 +149,29 @@
           flex-wrap: wrap;
         }
         
-        .date-row label {
+        #DayCalculatorContainer .date-row label {
           font-weight: bold;
           min-width: 80px;
           color: #555;
           width: 100%;
         }
         
-        .input-group {
+        #DayCalculatorContainer .input-group {
           display: flex;
           align-items: center;
           gap: 5px;
           flex-grow: 1;
+          flex-wrap: wrap;
         }
         
-        .dropdown-group {
+        #DayCalculatorContainer .dropdown-group {
           display: flex;
           gap: 5px;
           flex-grow: 1;
           flex-wrap: wrap;
         }
         
-        select {
+        #DayCalculatorContainer select {
           padding: 8px;
           border: 1px solid #ddd;
           border-radius: 4px;
@@ -190,58 +181,66 @@
           min-width: 60px;
         }
         
-        .month-dropdown {
-          width: 120px;
+        #DayCalculatorContainer .month-dropdown {
+          min-width: 120px;
         }
         
-        .day-dropdown {
-          width: 70px;
+        #DayCalculatorContainer .day-dropdown {
+          min-width: 70px;
         }
         
-        .year-dropdown {
-          width: 90px;
+        #DayCalculatorContainer .year-dropdown {
+          min-width: 90px;
         }
         
-        .calendar-button {
-          background: none;
-          border: 1px solid #ddd;
+        #DayCalculatorContainer .calendar-button {
+          background-color: #ad2a24;
+          color: #fff;
+          padding: 10px 15px;
+          border: none;
           border-radius: 4px;
-          padding: 8px;
           cursor: pointer;
-          display: flex;
+          font-weight: 600;
+          display: inline-flex;
           align-items: center;
-          justify-content: center;
+          gap: 8px;
+          transition: all 0.2s;
+          height: 40px;
+          flex: 0 0 auto;
         }
         
-        .calendar-button:hover {
-          background: #f5f5f5;
+        #DayCalculatorContainer .calendar-button:hover {
+          background-color: #c2332d;
         }
         
-        .button-group {
+        #DayCalculatorContainer .button-group {
           display: flex;
           gap: 10px;
           margin: 20px 0;
+          flex-wrap: wrap;
         }
         
-        .calculate-btn, .reset-btn {
+        #DayCalculatorContainer .calculate-btn, 
+        #DayCalculatorContainer .reset-btn {
           padding: 10px 15px;
           border: none;
           border-radius: 4px;
           cursor: pointer;
           flex: 1;
+          min-width: 120px;
         }
         
-        .calculate-btn {
+        #DayCalculatorContainer .calculate-btn {
           background-color: #ad2a24;
           color: white;
         }
         
-        .reset-btn {
+        #DayCalculatorContainer .reset-btn {
           background-color: #666;
           color: white;
         }
         
-        .error-message {
+        #DayCalculatorContainer .error-message {
           color: #d8000c;
           background: #ffe6e6;
           padding: 10px;
@@ -249,25 +248,25 @@
           margin-bottom: 15px;
         }
         
-        .results-container {
+        #DayCalculatorContainer .results-container {
           background: #f9f9f9;
           padding: 15px;
           border-radius: 4px;
           border: 1px solid #eee;
         }
         
-        .result-title {
+        #DayCalculatorContainer .result-title {
           color: #ad2a24;
           margin: 0 0 10px 0;
         }
         
-        .result-units {
+        #DayCalculatorContainer .result-units {
           display: flex;
           gap: 10px;
           flex-wrap: wrap;
         }
         
-        .result-unit {
+        #DayCalculatorContainer .result-unit {
           background: #f0f0f0;
           padding: 8px 12px;
           border-radius: 4px;
@@ -275,7 +274,7 @@
         }
         
         /* Calendar Modal Styles */
-        .calendar-modal {
+        #DayCalculatorContainer .calendar-modal {
           position: fixed;
           top: 50%;
           left: 50%;
@@ -289,14 +288,14 @@
           max-width: 90%;
         }
         
-        .calendar-header {
+        #DayCalculatorContainer .calendar-header {
           display: flex;
           justify-content: space-between;
           align-items: center;
           margin-bottom: 10px;
         }
         
-        .nav-button {
+        #DayCalculatorContainer .nav-button {
           background: none;
           border: none;
           font-size: 1.2rem;
@@ -305,13 +304,13 @@
           padding: 0 10px;
         }
         
-        .month-year-display {
+        #DayCalculatorContainer .month-year-display {
           margin: 0;
           color: #333;
           font-weight: bold;
         }
         
-        .calendar-weekdays {
+        #DayCalculatorContainer .calendar-weekdays {
           display: grid;
           grid-template-columns: repeat(7, 1fr);
           text-align: center;
@@ -320,59 +319,72 @@
           color: #555;
         }
         
-        .calendar-days {
+        #DayCalculatorContainer .calendar-days {
           display: grid;
           grid-template-columns: repeat(7, 1fr);
           gap: 5px;
         }
         
-        .calendar-day {
+        #DayCalculatorContainer .calendar-day {
           padding: 8px;
           text-align: center;
           cursor: pointer;
           border-radius: 4px;
         }
         
-        .calendar-day:hover {
+        #DayCalculatorContainer .calendar-day:hover {
           background: #f0f0f0;
         }
         
-        .calendar-day.selected {
+        #DayCalculatorContainer .calendar-day.selected {
           background: #ad2a24;
           color: white;
         }
         
-        .calendar-day.other-month {
+        #DayCalculatorContainer .calendar-day.other-month {
           color: #ccc;
         }
         
+        /* Improved mobile responsiveness */
         @media (max-width: 480px) {
-          .date-row {
+          #DayCalculatorContainer .date-row {
             flex-direction: column;
             align-items: flex-start;
           }
           
-          .date-row label {
+          #DayCalculatorContainer .date-row label {
             margin-bottom: 5px;
             width: auto;
           }
           
-          .dropdown-group {
+          #DayCalculatorContainer .dropdown-group {
             width: 100%;
           }
           
-          select {
+          #DayCalculatorContainer select {
             width: 100%;
+            min-width: 0;
           }
           
-          .month-dropdown,
-          .day-dropdown,
-          .year-dropdown {
+          #DayCalculatorContainer .month-dropdown,
+          #DayCalculatorContainer .day-dropdown,
+          #DayCalculatorContainer .year-dropdown {
             width: 100%;
+            min-width: 0;
           }
           
-          .button-group {
+          #DayCalculatorContainer .calendar-button {
+            width: 100%;
+            justify-content: center;
+          }
+          
+          #DayCalculatorContainer .button-group {
             flex-direction: column;
+          }
+          
+          #DayCalculatorContainer .calculate-btn, 
+          #DayCalculatorContainer .reset-btn {
+            width: 100%;
           }
         }
       `;
@@ -675,7 +687,7 @@
       // Reset function
       function resetCalculator() {
         // Reset dropdowns
-        const selects = document.querySelectorAll('.day-calculator select');
+        const selects = document.querySelectorAll('#DayCalculatorContainer .day-calculator select');
         selects.forEach(select => {
           select.value = '';
           if (select.id.includes('day')) {
@@ -707,8 +719,8 @@
       }
       
       // Set up button events
-      document.querySelector('.calculate-btn').addEventListener('click', calculateDifference);
-      document.querySelector('.reset-btn').addEventListener('click', resetCalculator);
+      document.querySelector('#DayCalculatorContainer .calculate-btn').addEventListener('click', calculateDifference);
+      document.querySelector('#DayCalculatorContainer .reset-btn').addEventListener('click', resetCalculator);
     });
   </script>
 </body>
