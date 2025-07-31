@@ -1,474 +1,715 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Day Calculator with Calendar Picker</title>
 </head>
 <body>
-    <div id="DayCalculator"></div>
+  <div id="DayCalculatorContainer" style="width: fit-content; margin: 0 auto;"></div>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  // Set up the calculator container
-  const calculator = document.getElementById('DayCalculator');
-  
-  // Add HTML structure
-  calculator.innerHTML = `
-    <div class="calculator-container">
-      <h3 class="calculator-title">Day Calculator</h3>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const container = document.getElementById('DayCalculatorContainer');
       
-      <div class="date-input-group">
-        <div class="date-input-row">
-          <div class="input-label">Start Date:</div>
-          <input type="date" id="start-date-picker" class="date-picker">
-          <span class="input-divider">or</span>
-          <div class="dropdown-group">
-            <select id="start-month" class="month-dropdown">
-              <option value="1">January</option>
-              <option value="2">February</option>
-              <option value="3">March</option>
-              <option value="4">April</option>
-              <option value="5">May</option>
-              <option value="6">June</option>
-              <option value="7">July</option>
-              <option value="8">August</option>
-              <option value="9">September</option>
-              <option value="10">October</option>
-              <option value="11">November</option>
-              <option value="12">December</option>
-            </select>
-            <select id="start-day" class="day-dropdown"></select>
-            <select id="start-year" class="year-dropdown"></select>
+      // Main HTML structure
+      container.innerHTML = `
+        <div class="day-calculator">
+          <h3 class="calculator-title">Day Calculator</h3>
+          
+          <div class="input-section">
+            <div class="date-row">
+              <label>Start Date:</label>
+              <div class="input-group">
+                <div class="dropdown-group">
+                  <select class="month-dropdown" id="start-month">
+                    <option value="" selected disabled>Month</option>
+                    <option value="1">January</option>
+                    <option value="2">February</option>
+                    <option value="3">March</option>
+                    <option value="4">April</option>
+                    <option value="5">May</option>
+                    <option value="6">June</option>
+                    <option value="7">July</option>
+                    <option value="8">August</option>
+                    <option value="9">September</option>
+                    <option value="10">October</option>
+                    <option value="11">November</option>
+                    <option value="12">December</option>
+                  </select>
+                  <select class="day-dropdown" id="start-day">
+                    <option value="" selected disabled>Day</option>
+                  </select>
+                  <select class="year-dropdown" id="start-year">
+                    <option value="" selected disabled>Year</option>
+                  </select>
+                </div>
+                <button class="calendar-button" id="start-calendar-btn">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ad2a24" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                  </svg>
+                </button>
+              </div>
+            </div>
+            
+            <div class="date-row">
+              <label>End Date:</label>
+              <div class="input-group">
+                <div class="dropdown-group">
+                  <select class="month-dropdown" id="end-month">
+                    <option value="" selected disabled>Month</option>
+                    <option value="1">January</option>
+                    <option value="2">February</option>
+                    <option value="3">March</option>
+                    <option value="4">April</option>
+                    <option value="5">May</option>
+                    <option value="6">June</option>
+                    <option value="7">July</option>
+                    <option value="8">August</option>
+                    <option value="9">September</option>
+                    <option value="10">October</option>
+                    <option value="11">November</option>
+                    <option value="12">December</option>
+                  </select>
+                  <select class="day-dropdown" id="end-day">
+                    <option value="" selected disabled>Day</option>
+                  </select>
+                  <select class="year-dropdown" id="end-year">
+                    <option value="" selected disabled>Year</option>
+                  </select>
+                </div>
+                <button class="calendar-button" id="end-calendar-btn">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ad2a24" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <div class="button-group">
+            <button class="calculate-btn">Calculate Days</button>
+            <button class="reset-btn">Reset</button>
+          </div>
+          
+          <div class="error-message" id="error-message" style="display:none;"></div>
+          
+          <div class="results-container" id="results-container" style="display:none;">
+            <h4 class="result-title" id="result-title"></h4>
+            <div class="result-units">
+              <div class="result-unit" id="result-days"></div>
+              <div class="result-unit" id="result-weeks"></div>
+              <div class="result-unit" id="result-months"></div>
+              <div class="result-unit" id="result-years"></div>
+            </div>
           </div>
         </div>
         
-        <div class="date-input-row">
-          <div class="input-label">End Date:</div>
-          <input type="date" id="end-date-picker" class="date-picker">
-          <span class="input-divider">or</span>
-          <div class="dropdown-group">
-            <select id="end-month" class="month-dropdown">
-              <option value="1">January</option>
-              <option value="2">February</option>
-              <option value="3">March</option>
-              <option value="4">April</option>
-              <option value="5">May</option>
-              <option value="6">June</option>
-              <option value="7">July</option>
-              <option value="8">August</option>
-              <option value="9">September</option>
-              <option value="10">October</option>
-              <option value="11">November</option>
-              <option value="12">December</option>
-            </select>
-            <select id="end-day" class="day-dropdown"></select>
-            <select id="end-year" class="year-dropdown"></select>
+        <!-- Calendar Modal -->
+        <div class="calendar-modal" id="calendar-modal" style="display:none;">
+          <div class="calendar-header">
+            <button class="nav-button prev-month">&lt;</button>
+            <h4 class="month-year-display"></h4>
+            <button class="nav-button next-month">&gt;</button>
+          </div>
+          <div class="calendar-grid">
+            <div class="calendar-weekdays">
+              <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+            </div>
+            <div class="calendar-days"></div>
           </div>
         </div>
-      </div>
-      
-      <div class="calculator-buttons">
-        <button id="calculate-btn" class="calculator-button">Calculate Days</button>
-        <button id="reset-btn" class="calculator-button secondary">Reset</button>
-      </div>
-      
-      <div id="date-error" class="error-message" style="display:none;"></div>
-      
-      <div id="date-results" class="calculator-results" style="display:none;">
-        <h4 id="result-days" class="result-header"></h4>
-        <div class="result-units">
-          <div id="result-weeks" class="result-unit"></div>
-          <div id="result-months" class="result-unit"></div>
-          <div id="result-years" class="result-unit"></div>
-        </div>
-      </div>
-    </div>
-  `;
-  
-  // Add CSS
-  const style = document.createElement('style');
-  style.textContent = `
-    #DayCalculator {
-      font-family: 'Georgia', serif;
-      max-width: 100%;
-      margin: 20px auto;
-    }
-    
-    #DayCalculator .calculator-container {
-      background: #fff;
-      padding: 15px;
-      border-radius: 5px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-    
-    #DayCalculator .calculator-title {
-      color: #ad2a24;
-      font-size: 1.5rem;
-      margin-bottom: 20px;
-      padding-bottom: 5px;
-      border-bottom: 1px solid #eee;
-    }
-    
-    #DayCalculator .date-input-row {
-      display: flex;
-      align-items: center;
-      margin-bottom: 15px;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-    
-    #DayCalculator .input-label {
-      font-weight: bold;
-      color: #555;
-      min-width: 80px;
-    }
-    
-    #DayCalculator .date-picker {
-      flex: 1;
-      min-width: 150px;
-      padding: 8px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      font-family: 'Georgia', serif;
-    }
-    
-    #DayCalculator .input-divider {
-      color: #777;
-      font-size: 0.9rem;
-    }
-    
-    #DayCalculator .dropdown-group {
-      display: flex;
-      flex: 2;
-      min-width: 200px;
-      gap: 5px;
-    }
-    
-    #DayCalculator .month-dropdown,
-    #DayCalculator .day-dropdown,
-    #DayCalculator .year-dropdown {
-      flex: 1;
-      padding: 8px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      font-family: 'Georgia', serif;
-    }
-    
-    #DayCalculator .calculator-buttons {
-      margin: 20px 0;
-      display: flex;
-      gap: 10px;
-    }
-    
-    #DayCalculator .calculator-button {
-      background-color: #ad2a24;
-      color: white;
-      border: none;
-      padding: 10px 15px;
-      font-size: 1rem;
-      cursor: pointer;
-      border-radius: 4px;
-      font-family: 'Georgia', serif;
-      flex: 1;
-    }
-    
-    #DayCalculator .calculator-button.secondary {
-      background-color: #666;
-    }
-    
-    #DayCalculator .calculator-button:hover {
-      opacity: 0.9;
-    }
-    
-    #DayCalculator .error-message {
-      padding: 15px;
-      background-color: #ffe6e6;
-      border: 1px solid #ffb6b6;
-      border-radius: 4px;
-      color: #d8000c;
-      margin-bottom: 15px;
-      display: none;
-    }
-    
-    #DayCalculator .calculator-results {
-      padding: 15px;
-      background-color: #f9f9f9;
-      border: 1px solid #eee;
-      border-radius: 4px;
-    }
-    
-    #DayCalculator .result-header {
-      color: #ad2a24;
-      margin-bottom: 10px;
-    }
-    
-    #DayCalculator .result-units {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-    
-    #DayCalculator .result-unit {
-      background-color: #f0f0f0;
-      padding: 8px 12px;
-      border-radius: 4px;
-      font-size: 0.9rem;
-    }
-    
-    @media (max-width: 600px) {
-      #DayCalculator .date-input-row {
-        flex-direction: column;
-        align-items: stretch;
-      }
-      
-      #DayCalculator .input-label {
-        width: 100%;
-        margin-bottom: 5px;
-      }
-      
-      #DayCalculator .input-divider {
-        margin: 5px 0;
-        text-align: center;
-        width: 100%;
-      }
-      
-      #DayCalculator .dropdown-group {
-        min-width: 100%;
-      }
-      
-      #DayCalculator .calculator-buttons {
-        flex-direction: column;
-      }
-    }
-  `;
-  document.head.appendChild(style);
+      `;
 
-  // Initialize year dropdowns (from 1900 to current year + 10)
-  const currentYear = new Date().getFullYear();
-  const yearSelects = [
-    document.getElementById('start-year'),
-    document.getElementById('end-year')
-  ];
-  
-  yearSelects.forEach(select => {
-    for (let year = 1900; year <= currentYear + 10; year++) {
-      const option = document.createElement('option');
-      option.value = year;
-      option.textContent = year;
-      select.appendChild(option);
-    }
-    select.value = currentYear;
-  });
-  
-  // Initialize day dropdowns
-  const daySelects = [
-    document.getElementById('start-day'),
-    document.getElementById('end-day')
-  ];
-  
-  function updateDays(monthSelect, yearSelect, daySelect) {
-    const month = parseInt(monthSelect.value);
-    const year = parseInt(yearSelect.value);
-    const daysInMonth = new Date(year, month, 0).getDate();
-    
-    // Save current selected day
-    const selectedDay = parseInt(daySelect.value) || 1;
-    
-    // Clear and repopulate days
-    daySelect.innerHTML = '';
-    for (let day = 1; day <= daysInMonth; day++) {
-      const option = document.createElement('option');
-      option.value = day;
-      option.textContent = day;
-      daySelect.appendChild(option);
-    }
-    
-    // Restore selected day if it exists in the new month
-    daySelect.value = Math.min(selectedDay, daysInMonth);
-  }
-  
-  // Initialize days and set up change listeners
-  const monthSelects = [
-    document.getElementById('start-month'),
-    document.getElementById('end-month')
-  ];
-  
-  monthSelects.forEach((monthSelect, index) => {
-    updateDays(monthSelect, yearSelects[index], daySelects[index]);
-    
-    monthSelect.addEventListener('change', () => {
-      updateDays(monthSelect, yearSelects[index], daySelects[index]);
-    });
-    
-    yearSelects[index].addEventListener('change', () => {
-      updateDays(monthSelect, yearSelects[index], daySelects[index]);
-    });
-  });
-  
-  // Set up date picker synchronization
-  const datePickers = [
-    document.getElementById('start-date-picker'),
-    document.getElementById('end-date-picker')
-  ];
-  
-  function updateDatePickerFromDropdowns(pickerIndex) {
-    const month = monthSelects[pickerIndex].value.padStart(2, '0');
-    const day = daySelects[pickerIndex].value.padStart(2, '0');
-    const year = yearSelects[pickerIndex].value;
-    datePickers[pickerIndex].value = `${year}-${month}-${day}`;
-  }
-  
-  function updateDropdownsFromDatePicker(pickerIndex) {
-    const date = new Date(datePickers[pickerIndex].value);
-    if (!isNaN(date.getTime())) {
-      monthSelects[pickerIndex].value = date.getMonth() + 1;
-      yearSelects[pickerIndex].value = date.getFullYear();
-      updateDays(monthSelects[pickerIndex], yearSelects[pickerIndex], daySelects[pickerIndex]);
-      daySelects[pickerIndex].value = date.getDate();
-    }
-  }
-  
-  // Initialize pickers
-  updateDatePickerFromDropdowns(0);
-  updateDatePickerFromDropdowns(1);
-  
-  // Set up event listeners
-  monthSelects.forEach((_, index) => {
-    datePickers[index].addEventListener('change', () => {
-      updateDropdownsFromDatePicker(index);
-    });
-    
-    [monthSelects[index], daySelects[index], yearSelects[index]].forEach(select => {
-      select.addEventListener('change', () => {
-        updateDatePickerFromDropdowns(index);
+      // Add CSS
+      const style = document.createElement('style');
+      style.textContent = `
+        .day-calculator {
+          font-family: Arial, sans-serif;
+          background: white;
+          padding: 20px;
+          border-radius: 8px;
+          box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+          width: fit-content;
+          max-width: 100%;
+        }
+        
+        .calculator-title {
+          color: #ad2a24;
+          margin: 0 0 15px 0;
+          font-size: 1.4rem;
+          text-align: center;
+        }
+        
+        .input-section {
+          margin-bottom: 15px;
+        }
+        
+        .date-row {
+          display: flex;
+          align-items: center;
+          margin-bottom: 10px;
+          gap: 10px;
+          flex-wrap: wrap;
+        }
+        
+        .date-row label {
+          font-weight: bold;
+          min-width: 80px;
+          color: #555;
+          width: 100%;
+        }
+        
+        .input-group {
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          flex-grow: 1;
+        }
+        
+        .dropdown-group {
+          display: flex;
+          gap: 5px;
+          flex-grow: 1;
+          flex-wrap: wrap;
+        }
+        
+        select {
+          padding: 8px;
+          border: 1px solid #ddd;
+          border-radius: 4px;
+          background: white;
+          color: #333;
+          flex-grow: 1;
+          min-width: 60px;
+        }
+        
+        .month-dropdown {
+          width: 120px;
+        }
+        
+        .day-dropdown {
+          width: 70px;
+        }
+        
+        .year-dropdown {
+          width: 90px;
+        }
+        
+        .calendar-button {
+          background: none;
+          border: 1px solid #ddd;
+          border-radius: 4px;
+          padding: 8px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        
+        .calendar-button:hover {
+          background: #f5f5f5;
+        }
+        
+        .button-group {
+          display: flex;
+          gap: 10px;
+          margin: 20px 0;
+        }
+        
+        .calculate-btn, .reset-btn {
+          padding: 10px 15px;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+          flex: 1;
+        }
+        
+        .calculate-btn {
+          background-color: #ad2a24;
+          color: white;
+        }
+        
+        .reset-btn {
+          background-color: #666;
+          color: white;
+        }
+        
+        .error-message {
+          color: #d8000c;
+          background: #ffe6e6;
+          padding: 10px;
+          border-radius: 4px;
+          margin-bottom: 15px;
+        }
+        
+        .results-container {
+          background: #f9f9f9;
+          padding: 15px;
+          border-radius: 4px;
+          border: 1px solid #eee;
+        }
+        
+        .result-title {
+          color: #ad2a24;
+          margin: 0 0 10px 0;
+        }
+        
+        .result-units {
+          display: flex;
+          gap: 10px;
+          flex-wrap: wrap;
+        }
+        
+        .result-unit {
+          background: #f0f0f0;
+          padding: 8px 12px;
+          border-radius: 4px;
+          font-size: 0.9rem;
+        }
+        
+        /* Calendar Modal Styles */
+        .calendar-modal {
+          position: fixed;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          background: white;
+          padding: 15px;
+          border-radius: 8px;
+          box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+          z-index: 1000;
+          width: 300px;
+          max-width: 90%;
+        }
+        
+        .calendar-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 10px;
+        }
+        
+        .nav-button {
+          background: none;
+          border: none;
+          font-size: 1.2rem;
+          cursor: pointer;
+          color: #ad2a24;
+          padding: 0 10px;
+        }
+        
+        .month-year-display {
+          margin: 0;
+          color: #333;
+          font-weight: bold;
+        }
+        
+        .calendar-weekdays {
+          display: grid;
+          grid-template-columns: repeat(7, 1fr);
+          text-align: center;
+          font-weight: bold;
+          margin-bottom: 5px;
+          color: #555;
+        }
+        
+        .calendar-days {
+          display: grid;
+          grid-template-columns: repeat(7, 1fr);
+          gap: 5px;
+        }
+        
+        .calendar-day {
+          padding: 8px;
+          text-align: center;
+          cursor: pointer;
+          border-radius: 4px;
+        }
+        
+        .calendar-day:hover {
+          background: #f0f0f0;
+        }
+        
+        .calendar-day.selected {
+          background: #ad2a24;
+          color: white;
+        }
+        
+        .calendar-day.other-month {
+          color: #ccc;
+        }
+        
+        @media (max-width: 480px) {
+          .date-row {
+            flex-direction: column;
+            align-items: flex-start;
+          }
+          
+          .date-row label {
+            margin-bottom: 5px;
+            width: auto;
+          }
+          
+          .dropdown-group {
+            width: 100%;
+          }
+          
+          select {
+            width: 100%;
+          }
+          
+          .month-dropdown,
+          .day-dropdown,
+          .year-dropdown {
+            width: 100%;
+          }
+          
+          .button-group {
+            flex-direction: column;
+          }
+        }
+      `;
+      document.head.appendChild(style);
+
+      // Initialize year dropdowns
+      const currentYear = new Date().getFullYear();
+      const yearSelects = [
+        document.getElementById('start-year'),
+        document.getElementById('end-year')
+      ];
+      
+      // Populate year dropdowns
+      yearSelects.forEach(select => {
+        for (let year = currentYear - 100; year <= currentYear + 10; year++) {
+          const option = document.createElement('option');
+          option.value = year;
+          option.textContent = year;
+          select.appendChild(option);
+        }
       });
+
+      // Initialize day dropdowns
+      const daySelects = [
+        document.getElementById('start-day'),
+        document.getElementById('end-day')
+      ];
+      
+      // Function to update days based on month/year
+      function updateDays(monthSelect, yearSelect, daySelect) {
+        const month = parseInt(monthSelect.value);
+        const year = parseInt(yearSelect.value);
+        
+        // Clear day dropdown
+        daySelect.innerHTML = '<option value="" selected disabled>Day</option>';
+        
+        if (isNaN(month)) {
+          daySelect.innerHTML = '<option value="" selected disabled>Select month first</option>';
+          return;
+        }
+        
+        if (isNaN(year)) {
+          daySelect.innerHTML = '<option value="" selected disabled>Select year first</option>';
+          return;
+        }
+        
+        const daysInMonth = new Date(year, month, 0).getDate();
+        const selectedDay = daySelect.value;
+        
+        for (let day = 1; day <= daysInMonth; day++) {
+          const option = document.createElement('option');
+          option.value = day;
+          option.textContent = day;
+          daySelect.appendChild(option);
+        }
+        
+        // Restore selected day if valid
+        if (selectedDay && selectedDay <= daysInMonth) {
+          daySelect.value = selectedDay;
+        }
+      }
+      
+      // Set up change listeners for month/year dropdowns
+      const monthSelects = [
+        document.getElementById('start-month'),
+        document.getElementById('end-month')
+      ];
+      
+      monthSelects.forEach((monthSelect, index) => {
+        monthSelect.addEventListener('change', () => {
+          updateDays(monthSelect, yearSelects[index], daySelects[index]);
+        });
+        
+        yearSelects[index].addEventListener('change', () => {
+          updateDays(monthSelect, yearSelects[index], daySelects[index]);
+        });
+      });
+
+      // Calendar Picker Functionality
+      let currentCalendar = null;
+      let currentDisplayDate = new Date();
+      let selectedStartDate = null;
+      let selectedEndDate = null;
+      
+      function renderCalendar(date) {
+        const modal = document.getElementById('calendar-modal');
+        const monthYearDisplay = modal.querySelector('.month-year-display');
+        const calendarDays = modal.querySelector('.calendar-days');
+        
+        // Set month/year display
+        const monthNames = ["January", "February", "March", "April", "May", "June",
+          "July", "August", "September", "October", "November", "December"];
+        monthYearDisplay.textContent = `${monthNames[date.getMonth()]} ${date.getFullYear()}`;
+        
+        // Get first day of month and total days
+        const firstDay = new Date(date.getFullYear(), date.getMonth(), 1).getDay();
+        const daysInMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+        
+        // Get days from previous month
+        const prevMonthDays = new Date(date.getFullYear(), date.getMonth(), 0).getDate();
+        
+        // Clear calendar
+        calendarDays.innerHTML = '';
+        
+        // Add days from previous month
+        for (let i = firstDay - 1; i >= 0; i--) {
+          const dayElement = document.createElement('div');
+          dayElement.textContent = prevMonthDays - i;
+          dayElement.classList.add('calendar-day', 'other-month');
+          dayElement.addEventListener('click', () => {
+            const newDate = new Date(date.getFullYear(), date.getMonth() - 1, prevMonthDays - i);
+            currentDisplayDate = newDate;
+            renderCalendar(newDate);
+          });
+          calendarDays.appendChild(dayElement);
+        }
+        
+        // Add days from current month
+        for (let i = 1; i <= daysInMonth; i++) {
+          const dayElement = document.createElement('div');
+          dayElement.textContent = i;
+          dayElement.classList.add('calendar-day');
+          
+          const currentDate = new Date(date.getFullYear(), date.getMonth(), i);
+          
+          // Highlight if this is the selected start or end date
+          if (currentCalendar === 'start' && selectedStartDate && 
+              currentDate.toDateString() === selectedStartDate.toDateString()) {
+            dayElement.classList.add('selected');
+          } else if (currentCalendar === 'end' && selectedEndDate && 
+              currentDate.toDateString() === selectedEndDate.toDateString()) {
+            dayElement.classList.add('selected');
+          }
+          
+          dayElement.addEventListener('click', () => {
+            const selectedDate = new Date(date.getFullYear(), date.getMonth(), i);
+            if (currentCalendar === 'start') {
+              selectedStartDate = selectedDate;
+              setSelectedDate(selectedDate, 'start');
+            } else {
+              selectedEndDate = selectedDate;
+              setSelectedDate(selectedDate, 'end');
+            }
+            document.getElementById('calendar-modal').style.display = 'none';
+          });
+          calendarDays.appendChild(dayElement);
+        }
+        
+        // Add days from next month
+        const daysToAdd = 42 - (firstDay + daysInMonth);
+        for (let i = 1; i <= daysToAdd; i++) {
+          const dayElement = document.createElement('div');
+          dayElement.textContent = i;
+          dayElement.classList.add('calendar-day', 'other-month');
+          dayElement.addEventListener('click', () => {
+            const newDate = new Date(date.getFullYear(), date.getMonth() + 1, i);
+            currentDisplayDate = newDate;
+            renderCalendar(newDate);
+          });
+          calendarDays.appendChild(dayElement);
+        }
+      }
+      
+      function setSelectedDate(date, target) {
+        const monthSelect = document.getElementById(`${target}-month`);
+        const daySelect = document.getElementById(`${target}-day`);
+        const yearSelect = document.getElementById(`${target}-year`);
+        
+        monthSelect.value = date.getMonth() + 1;
+        yearSelect.value = date.getFullYear();
+        
+        // Update days dropdown
+        updateDays(monthSelect, yearSelect, daySelect);
+        
+        // Set day value after dropdown is populated
+        setTimeout(() => {
+          daySelect.value = date.getDate();
+        }, 0);
+      }
+      
+      // Set up calendar button events
+      document.getElementById('start-calendar-btn').addEventListener('click', () => {
+        currentCalendar = 'start';
+        const modal = document.getElementById('calendar-modal');
+        modal.style.display = 'block';
+        renderCalendar(currentDisplayDate);
+        
+        // Set up navigation buttons
+        modal.querySelector('.prev-month').onclick = () => {
+          currentDisplayDate = new Date(currentDisplayDate.getFullYear(), currentDisplayDate.getMonth() - 1, 1);
+          renderCalendar(currentDisplayDate);
+        };
+        
+        modal.querySelector('.next-month').onclick = () => {
+          currentDisplayDate = new Date(currentDisplayDate.getFullYear(), currentDisplayDate.getMonth() + 1, 1);
+          renderCalendar(currentDisplayDate);
+        };
+      });
+      
+      document.getElementById('end-calendar-btn').addEventListener('click', () => {
+        currentCalendar = 'end';
+        const modal = document.getElementById('calendar-modal');
+        modal.style.display = 'block';
+        renderCalendar(currentDisplayDate);
+        
+        // Set up navigation buttons
+        modal.querySelector('.prev-month').onclick = () => {
+          currentDisplayDate = new Date(currentDisplayDate.getFullYear(), currentDisplayDate.getMonth() - 1, 1);
+          renderCalendar(currentDisplayDate);
+        };
+        
+        modal.querySelector('.next-month').onclick = () => {
+          currentDisplayDate = new Date(currentDisplayDate.getFullYear(), currentDisplayDate.getMonth() + 1, 1);
+          renderCalendar(currentDisplayDate);
+        };
+      });
+      
+      // Close modal when clicking outside
+      window.addEventListener('click', (event) => {
+        const modal = document.getElementById('calendar-modal');
+        if (event.target === modal) {
+          modal.style.display = 'none';
+        }
+      });
+
+      // Calculate function
+      function calculateDifference() {
+        const startYear = document.getElementById('start-year').value;
+        const startMonth = document.getElementById('start-month').value;
+        const startDay = document.getElementById('start-day').value;
+        
+        const endYear = document.getElementById('end-year').value;
+        const endMonth = document.getElementById('end-month').value;
+        const endDay = document.getElementById('end-day').value;
+        
+        // Validate selections
+        if (!startYear || !startMonth || !startDay) {
+          showError("Please select a valid start date");
+          return;
+        }
+        
+        if (!endYear || !endMonth || !endDay) {
+          showError("Please select a valid end date");
+          return;
+        }
+        
+        const startDate = new Date(
+          parseInt(startYear),
+          parseInt(startMonth) - 1,
+          parseInt(startDay)
+        );
+        
+        const endDate = new Date(
+          parseInt(endYear),
+          parseInt(endMonth) - 1,
+          parseInt(endDay)
+        );
+        
+        // Validate end date is after start date
+        if (endDate < startDate) {
+          showError("End date must be after start date");
+          return;
+        }
+        
+        const diffTime = Math.abs(endDate - startDate);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+        
+        // Calculate other units
+        const diffWeeks = Math.round(diffDays / 7 * 10) / 10;
+        const diffMonths = Math.round(diffDays / 30.44 * 10) / 10;
+        const diffYears = Math.round(diffDays / 365.25 * 10) / 10;
+        
+        // Format dates
+        const startDateStr = startDate.toLocaleDateString('en-US', { 
+          month: 'long', 
+          day: 'numeric', 
+          year: 'numeric' 
+        });
+        const endDateStr = endDate.toLocaleDateString('en-US', { 
+          month: 'long', 
+          day: 'numeric', 
+          year: 'numeric' 
+        });
+        
+        // Display results
+        document.getElementById('results-container').style.display = 'block';
+        
+        document.getElementById('result-title').textContent = 
+          `Between ${startDateStr} and ${endDateStr}`;
+        
+        document.getElementById('result-days').textContent = `${diffDays} day${diffDays !== 1 ? 's' : ''}`;
+        document.getElementById('result-weeks').textContent = `${diffWeeks} week${diffWeeks !== 1 ? 's' : ''}`;
+        document.getElementById('result-months').textContent = `${diffMonths} month${diffMonths !== 1 ? 's' : ''}`;
+        document.getElementById('result-years').textContent = `${diffYears} year${diffYears !== 1 ? 's' : ''}`;
+        
+        // Hide error if previously shown
+        hideError();
+      }
+      
+      // Reset function
+      function resetCalculator() {
+        // Reset dropdowns
+        const selects = document.querySelectorAll('.day-calculator select');
+        selects.forEach(select => {
+          select.value = '';
+          if (select.id.includes('day')) {
+            select.innerHTML = '<option value="" selected disabled>Day</option>';
+          }
+        });
+        
+        // Reset selected dates
+        selectedStartDate = null;
+        selectedEndDate = null;
+        currentDisplayDate = new Date();
+        
+        // Hide results and errors
+        document.getElementById('results-container').style.display = 'none';
+        document.getElementById('error-message').style.display = 'none';
+      }
+      
+      // Show error message
+      function showError(message) {
+        const errorDiv = document.getElementById('error-message');
+        errorDiv.textContent = message;
+        errorDiv.style.display = 'block';
+        document.getElementById('results-container').style.display = 'none';
+      }
+      
+      // Hide error message
+      function hideError() {
+        document.getElementById('error-message').style.display = 'none';
+      }
+      
+      // Set up button events
+      document.querySelector('.calculate-btn').addEventListener('click', calculateDifference);
+      document.querySelector('.reset-btn').addEventListener('click', resetCalculator);
     });
-  });
-  
-  // Show error message
-  function showError(message) {
-    const errorDiv = document.getElementById('date-error');
-    errorDiv.textContent = message;
-    errorDiv.style.display = 'block';
-    document.getElementById('date-results').style.display = 'none';
-  }
-  
-  // Hide error message
-  function hideError() {
-    document.getElementById('date-error').style.display = 'none';
-  }
-  
-  // Validate dates
-  function validateDates(startDate, endDate) {
-    // Check if dates are valid
-    if (isNaN(startDate.getTime())) {
-      showError("Please enter a valid start date");
-      return false;
-    }
-    
-    if (isNaN(endDate.getTime())) {
-      showError("Please enter a valid end date");
-      return false;
-    }
-    
-    hideError();
-    return true;
-  }
-  
-  // Calculate function with rounded figures
-  function calculateDifference() {
-    const startDate = new Date(
-      parseInt(yearSelects[0].value),
-      parseInt(monthSelects[0].value) - 1,
-      parseInt(daySelects[0].value)
-    );
-    
-    const endDate = new Date(
-      parseInt(yearSelects[1].value),
-      parseInt(monthSelects[1].value) - 1,
-      parseInt(daySelects[1].value)
-    );
-    
-    // Validate dates
-    if (!validateDates(startDate, endDate)) {
-      return;
-    }
-    
-    // Swap dates if end is before start
-    let swapped = false;
-    if (endDate < startDate) {
-      [startDate, endDate] = [endDate, startDate];
-      swapped = true;
-    }
-    
-    const diffTime = Math.abs(endDate - startDate);
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
-    
-    // Calculate other units with rounding
-    const diffWeeks = Math.round(diffDays / 7);
-    const diffMonths = Math.round(diffDays / 30.44);
-    const diffYears = Math.round(diffDays / 365.25 * 10) / 10;
-    
-    // Format dates
-    const startDateStr = startDate.toLocaleDateString('en-US', { 
-      month: 'long', 
-      day: 'numeric', 
-      year: 'numeric' 
-    });
-    const endDateStr = endDate.toLocaleDateString('en-US', { 
-      month: 'long', 
-      day: 'numeric', 
-      year: 'numeric' 
-    });
-    
-    // Display results
-    const resultsDiv = document.getElementById('date-results');
-    resultsDiv.style.display = 'block';
-    document.getElementById('result-days').textContent = 
-      swapped 
-        ? `Between ${endDateStr} and ${startDateStr} is ${diffDays} days`
-        : `Between ${startDateStr} and ${endDateStr} is ${diffDays} days`;
-    document.getElementById('result-weeks').textContent = `${diffWeeks} week${diffWeeks !== 1 ? 's' : ''}`;
-    document.getElementById('result-months').textContent = `${diffMonths} month${diffMonths !== 1 ? 's' : ''}`;
-    document.getElementById('result-years').textContent = `${diffYears} year${diffYears !== 1 ? 's' : ''}`;
-  }
-  
-  // Reset function
-  function resetCalculator() {
-    const today = new Date();
-    
-    // Set start date to today
-    monthSelects[0].value = today.getMonth() + 1;
-    yearSelects[0].value = today.getFullYear();
-    updateDays(monthSelects[0], yearSelects[0], daySelects[0]);
-    daySelects[0].value = today.getDate();
-    
-    // Set end date to today + 1 day
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    
-    monthSelects[1].value = tomorrow.getMonth() + 1;
-    yearSelects[1].value = tomorrow.getFullYear();
-    updateDays(monthSelects[1], yearSelects[1], daySelects[1]);
-    daySelects[1].value = tomorrow.getDate();
-    
-    // Update pickers
-    updateDatePickerFromDropdowns(0);
-    updateDatePickerFromDropdowns(1);
-    
-    // Hide output and errors
-    document.getElementById('date-results').style.display = 'none';
-    hideError();
-  }
-  
-  // Set up button events
-  document.getElementById('calculate-btn').addEventListener('click', calculateDifference);
-  document.getElementById('reset-btn').addEventListener('click', resetCalculator);
-  
-  // Initialize
-  resetCalculator();
-});
-</script>
+  </script>
 </body>
 </html>
