@@ -104,15 +104,23 @@
         <!-- Calendar Modal -->
         <div class="calendar-modal" id="calendar-modal" style="display:none;">
           <div class="calendar-header">
-            <button class="nav-button prev-month">&lt;</button>
-            <h4 class="month-year-display"></h4>
-            <button class="nav-button next-month">&gt;</button>
+            <button class="nav-button prev-month">❮</button>
+            <select id="calendar-month" class="calendar-dropdown"></select>
+            <select id="calendar-year" class="calendar-dropdown"></select>
+            <button class="nav-button next-month">❯</button>
           </div>
+
           <div class="calendar-grid">
             <div class="calendar-weekdays">
               <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
             </div>
             <div class="calendar-days"></div>
+          </div>
+          
+          <!-- Added Select/Cancel buttons -->
+          <div class="calendar-footer">
+            <button class="calendar-select-btn">Select</button>
+            <button class="calendar-cancel-btn">Cancel</button>
           </div>
         </div>
       `;
@@ -304,12 +312,6 @@
           padding: 0 10px;
         }
         
-        #DayCalculatorContainer .month-year-display {
-          margin: 0;
-          color: #333;
-          font-weight: bold;
-        }
-        
         #DayCalculatorContainer .calendar-weekdays {
           display: grid;
           grid-template-columns: repeat(7, 1fr);
@@ -343,6 +345,33 @@
         
         #DayCalculatorContainer .calendar-day.other-month {
           color: #ccc;
+        }
+        
+        /* Calendar Footer Styles */
+        #DayCalculatorContainer .calendar-footer {
+          display: flex;
+          justify-content: flex-end;
+          gap: 10px;
+          margin-top: 15px;
+        }
+        
+        #DayCalculatorContainer .calendar-select-btn,
+        #DayCalculatorContainer .calendar-cancel-btn {
+          padding: 8px 15px;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+          font-weight: 600;
+        }
+        
+        #DayCalculatorContainer .calendar-select-btn {
+          background-color: #ad2a24;
+          color: white;
+        }
+        
+        #DayCalculatorContainer .calendar-cancel-btn {
+          background-color: #666;
+          color: white;
         }
         
         /* Improved mobile responsiveness */
@@ -392,6 +421,8 @@
 
       // Initialize year dropdowns
       const currentYear = new Date().getFullYear();
+      const dropdownCurrentYear = currentYear;
+
       const yearSelects = [
         document.getElementById('start-year'),
         document.getElementById('end-year')
@@ -468,16 +499,55 @@
       let currentDisplayDate = new Date();
       let selectedStartDate = null;
       let selectedEndDate = null;
+      let tempSelectedDate = null;
       
+      const monthNames = ["January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"];
+
+      const monthDropdown = document.getElementById('calendar-month');
+      const yearDropdown = document.getElementById('calendar-year');
+
+      // Populate month dropdown
+      monthNames.forEach((month, index) => {
+        const option = document.createElement('option');
+        option.value = index;
+        option.textContent = month;
+        monthDropdown.appendChild(option);
+      });
+
+      // Populate year dropdown
+      for (let year = currentYear - 100; year <= currentYear + 10; year++) {
+        const option = document.createElement('option');
+        option.value = year;
+        option.textContent = year;
+        yearDropdown.appendChild(option);
+      }
+
+      // Month/year dropdown change handlers
+      monthDropdown.addEventListener('change', () => {
+        const selectedMonth = parseInt(monthDropdown.value);
+        const selectedYear = parseInt(yearDropdown.value);
+        if (!isNaN(selectedMonth) && !isNaN(selectedYear)) {
+          currentDisplayDate = new Date(selectedYear, selectedMonth, 1);
+          renderCalendar(currentDisplayDate);
+        }
+      });
+
+      yearDropdown.addEventListener('change', () => {
+        const selectedMonth = parseInt(monthDropdown.value);
+        const selectedYear = parseInt(yearDropdown.value);
+        if (!isNaN(selectedMonth) && !isNaN(selectedYear)) {
+          currentDisplayDate = new Date(selectedYear, selectedMonth, 1);
+          renderCalendar(currentDisplayDate);
+        }
+      });
+
       function renderCalendar(date) {
-        const modal = document.getElementById('calendar-modal');
-        const monthYearDisplay = modal.querySelector('.month-year-display');
-        const calendarDays = modal.querySelector('.calendar-days');
+        monthDropdown.value = date.getMonth();
+        yearDropdown.value = date.getFullYear();
         
-        // Set month/year display
-        const monthNames = ["January", "February", "March", "April", "May", "June",
-          "July", "August", "September", "October", "November", "December"];
-        monthYearDisplay.textContent = `${monthNames[date.getMonth()]} ${date.getFullYear()}`;
+        const modal = document.getElementById('calendar-modal');
+        const calendarDays = modal.querySelector('.calendar-days');
         
         // Get first day of month and total days
         const firstDay = new Date(date.getFullYear(), date.getMonth(), 1).getDay();
@@ -510,25 +580,19 @@
           
           const currentDate = new Date(date.getFullYear(), date.getMonth(), i);
           
-          // Highlight if this is the selected start or end date
-          if (currentCalendar === 'start' && selectedStartDate && 
-              currentDate.toDateString() === selectedStartDate.toDateString()) {
-            dayElement.classList.add('selected');
-          } else if (currentCalendar === 'end' && selectedEndDate && 
-              currentDate.toDateString() === selectedEndDate.toDateString()) {
+          // Highlight if this is the selected date
+          if (tempSelectedDate && currentDate.toDateString() === tempSelectedDate.toDateString()) {
             dayElement.classList.add('selected');
           }
           
           dayElement.addEventListener('click', () => {
-            const selectedDate = new Date(date.getFullYear(), date.getMonth(), i);
-            if (currentCalendar === 'start') {
-              selectedStartDate = selectedDate;
-              setSelectedDate(selectedDate, 'start');
-            } else {
-              selectedEndDate = selectedDate;
-              setSelectedDate(selectedDate, 'end');
-            }
-            document.getElementById('calendar-modal').style.display = 'none';
+            // Remove previous selection
+            const prevSelected = calendarDays.querySelector('.selected');
+            if (prevSelected) prevSelected.classList.remove('selected');
+            
+            // Add new selection
+            dayElement.classList.add('selected');
+            tempSelectedDate = new Date(date.getFullYear(), date.getMonth(), i);
           });
           calendarDays.appendChild(dayElement);
         }
@@ -566,8 +630,9 @@
       }
       
       // Set up calendar button events
-      document.getElementById('start-calendar-btn').addEventListener('click', () => {
-        currentCalendar = 'start';
+      function setupCalendar(target) {
+        currentCalendar = target;
+        tempSelectedDate = target === 'start' ? selectedStartDate : selectedEndDate;
         const modal = document.getElementById('calendar-modal');
         modal.style.display = 'block';
         renderCalendar(currentDisplayDate);
@@ -582,24 +647,34 @@
           currentDisplayDate = new Date(currentDisplayDate.getFullYear(), currentDisplayDate.getMonth() + 1, 1);
           renderCalendar(currentDisplayDate);
         };
+        
+        // Set up select/cancel buttons
+        const selectBtn = modal.querySelector('.calendar-select-btn');
+        const cancelBtn = modal.querySelector('.calendar-cancel-btn');
+        
+        selectBtn.onclick = () => {
+          if (tempSelectedDate) {
+            if (currentCalendar === 'start') {
+              selectedStartDate = tempSelectedDate;
+            } else {
+              selectedEndDate = tempSelectedDate;
+            }
+            setSelectedDate(tempSelectedDate, currentCalendar);
+            modal.style.display = 'none';
+          }
+        };
+        
+        cancelBtn.onclick = () => {
+          modal.style.display = 'none';
+        };
+      }
+      
+      document.getElementById('start-calendar-btn').addEventListener('click', () => {
+        setupCalendar('start');
       });
       
       document.getElementById('end-calendar-btn').addEventListener('click', () => {
-        currentCalendar = 'end';
-        const modal = document.getElementById('calendar-modal');
-        modal.style.display = 'block';
-        renderCalendar(currentDisplayDate);
-        
-        // Set up navigation buttons
-        modal.querySelector('.prev-month').onclick = () => {
-          currentDisplayDate = new Date(currentDisplayDate.getFullYear(), currentDisplayDate.getMonth() - 1, 1);
-          renderCalendar(currentDisplayDate);
-        };
-        
-        modal.querySelector('.next-month').onclick = () => {
-          currentDisplayDate = new Date(currentDisplayDate.getFullYear(), currentDisplayDate.getMonth() + 1, 1);
-          renderCalendar(currentDisplayDate);
-        };
+        setupCalendar('end');
       });
       
       // Close modal when clicking outside
@@ -718,9 +793,11 @@
         document.getElementById('error-message').style.display = 'none';
       }
       
-      // Set up button events
-      document.querySelector('#DayCalculatorContainer .calculate-btn').addEventListener('click', calculateDifference);
-      document.querySelector('#DayCalculatorContainer .reset-btn').addEventListener('click', resetCalculator);
+      // Set up button events with a slight delay to ensure elements exist
+      setTimeout(() => {
+        document.querySelector('#DayCalculatorContainer .calculate-btn').addEventListener('click', calculateDifference);
+        document.querySelector('#DayCalculatorContainer .reset-btn').addEventListener('click', resetCalculator);
+      }, 100);
     });
   </script>
 </body>
