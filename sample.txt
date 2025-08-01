@@ -105,7 +105,8 @@
         <div class="calendar-modal" id="calendar-modal" style="display:none;">
           <div class="calendar-header">
             <button class="nav-button prev-month">❮</button>
-            <div class="month-year-display" id="month-year-display">August 2025</div>
+            <select id="calendar-month" class="calendar-dropdown"></select>
+            <select id="calendar-year" class="calendar-dropdown"></select>
             <button class="nav-button next-month">❯</button>
           </div>
 
@@ -116,6 +117,7 @@
             <div class="calendar-days"></div>
           </div>
           
+          <!-- Added Select/Cancel buttons -->
           <div class="calendar-footer">
             <button class="calendar-select-btn">Select</button>
             <button class="calendar-cancel-btn">Cancel</button>
@@ -123,7 +125,7 @@
         </div>
       `;
 
-      // Add CSS
+      // Add CSS - All selectors now properly scoped to the container
       const style = document.createElement('style');
       style.textContent = `
         #DayCalculatorContainer .day-calculator {
@@ -308,15 +310,6 @@
           cursor: pointer;
           color: #ad2a24;
           padding: 0 10px;
-        }
-        
-        #DayCalculatorContainer .month-year-display {
-          font-size: 1.2rem;
-          font-weight: bold;
-          margin: 0 15px;
-          color: #333;
-          flex-grow: 1;
-          text-align: center;
         }
         
         #DayCalculatorContainer .calendar-weekdays {
@@ -511,13 +504,50 @@
       const monthNames = ["January", "February", "March", "April", "May", "June",
         "July", "August", "September", "October", "November", "December"];
 
+      const monthDropdown = document.getElementById('calendar-month');
+      const yearDropdown = document.getElementById('calendar-year');
+
+      // Populate month dropdown
+      monthNames.forEach((month, index) => {
+        const option = document.createElement('option');
+        option.value = index;
+        option.textContent = month;
+        monthDropdown.appendChild(option);
+      });
+
+      // Populate year dropdown
+      for (let year = currentYear - 100; year <= currentYear + 10; year++) {
+        const option = document.createElement('option');
+        option.value = year;
+        option.textContent = year;
+        yearDropdown.appendChild(option);
+      }
+
+      // Month/year dropdown change handlers
+      monthDropdown.addEventListener('change', () => {
+        const selectedMonth = parseInt(monthDropdown.value);
+        const selectedYear = parseInt(yearDropdown.value);
+        if (!isNaN(selectedMonth) && !isNaN(selectedYear)) {
+          currentDisplayDate = new Date(selectedYear, selectedMonth, 1);
+          renderCalendar(currentDisplayDate);
+        }
+      });
+
+      yearDropdown.addEventListener('change', () => {
+        const selectedMonth = parseInt(monthDropdown.value);
+        const selectedYear = parseInt(yearDropdown.value);
+        if (!isNaN(selectedMonth) && !isNaN(selectedYear)) {
+          currentDisplayDate = new Date(selectedYear, selectedMonth, 1);
+          renderCalendar(currentDisplayDate);
+        }
+      });
+
       function renderCalendar(date) {
-        const modal = document.getElementById('calendar-modal');
-        const monthYearDisplay = document.getElementById('month-year-display');
-        const calendarDays = modal.querySelector('.calendar-days');
+        monthDropdown.value = date.getMonth();
+        yearDropdown.value = date.getFullYear();
         
-        // Update month/year display
-        monthYearDisplay.textContent = `${monthNames[date.getMonth()]} ${date.getFullYear()}`;
+        const modal = document.getElementById('calendar-modal');
+        const calendarDays = modal.querySelector('.calendar-days');
         
         // Get first day of month and total days
         const firstDay = new Date(date.getFullYear(), date.getMonth(), 1).getDay();
@@ -562,7 +592,7 @@
             
             // Add new selection
             dayElement.classList.add('selected');
-            tempSelectedDate = currentDate;
+            tempSelectedDate = new Date(date.getFullYear(), date.getMonth(), i);
           });
           calendarDays.appendChild(dayElement);
         }
