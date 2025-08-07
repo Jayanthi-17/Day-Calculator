@@ -1,252 +1,451 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Day Calculator</title>
-  <style>
-    body 
-    { 
-      background: #f9f6ee; 
-      margin: 0; padding: 40px 0; 
-      font-family: 'Georgia', serif; 
-    }
-    #DayCalculatorContainer 
-    { 
-    max-width: 425px; margin: 0 auto; }
-    .dc-card { background: #f9f6ee; border-radius: 12px; box-shadow: 0 2px 12px #0001; padding: 38px 35px 30px; width: 100%; }
-    .dc-title { font-size: 2.1rem; color: #553a4d; font-weight: bold; margin-bottom: 30px; letter-spacing: -1px;}
-    .dc-label { color: #af6b35; font-weight: 600; font-size: 1.05rem; margin-bottom: 4px; display: block;}
-    .dc-daterow { margin-bottom: 16px;}
-    .dc-row { display: flex; gap: 11px; margin-bottom: 10px;}
-    .dc-dropdown { padding: 9px 8px; border: 1px solid #e6dfd0; border-radius: 4px; font-size: 1.04rem; outline: none; width: 112px; background: #fff; color: #222;}
-    .dc-dropdown:focus { border-color: #af6b35;}
-    .dc-btns { display: flex; gap: 13px; margin: 18px 0 10px 0;}
-    .dc-calc-btn { background: #b43a22; color: #fff; font-weight: bold; font-size: 1.11rem; padding: 12px 0; border: none; border-radius: 6px; width: 54%; cursor: pointer; transition: background 0.15s; }
-    .dc-calc-btn:hover { background: #98301e; }
-    .dc-reset-btn { background: #dfcda7; color: #885b23; font-weight: bold; font-size: 1.11rem; padding: 12px 0; border: none; border-radius: 6px; width: 46%; cursor: pointer; transition: background 0.15s;}
-    .dc-reset-btn:hover { background: #e8e0c5; }
-    .dc-error { color: #b43a22; background: #fff5ef; padding: 10px 12px; border-radius: 5px; font-weight: bold; margin-bottom: 11px;}
-    .dc-results { background: #fff; padding: 15px 18px 13px; border-radius: 6px; border: 1px solid #eee4c9; margin-top: 10px;}
-    .dc-results .dc-reslabel { color: #b43a22; font-weight: bold; margin-bottom: 8px; font-size: 1.09rem;}
-    .dc-units { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 9px;}
-    .dc-unit { background: #f0ece5; padding: 9px 14px; border-radius: 4px; font-size: .98rem; color: #3a3030;}
-    @media (max-width: 500px) {
-      .dc-card { padding: 18px 3vw 18px 3vw; }
-      .dc-row { flex-direction: column; gap: 6px; }
-      .dc-btns { flex-direction: column; gap: 10px; }
-      .dc-dropdown { width: 100%; }
-      #DayCalculatorContainer { width: 98vw;}
-    }
-  </style>
 </head>
 <body>
-<div id="DayCalculatorContainer">
-  <div class="dc-card">
-    <div class="dc-title">Day Calculator</div>
-    <div class="dc-daterow">
-      <label class="dc-label">Start Date</label>
-      <div class="dc-row">
-        <select class="dc-dropdown" id="start-month">
-          <option value="">Month</option>
-          <option value="1">January</option><option value="2">February</option><option value="3">March</option>
-          <option value="4">April</option><option value="5">May</option><option value="6">June</option>
-          <option value="7">July</option><option value="8">August</option><option value="9">September</option>
-          <option value="10">October</option><option value="11">November</option><option value="12">December</option>
-        </select>
-        <select class="dc-dropdown" id="start-day">
-          <option value="">Day</option>
-        </select>
-        <select class="dc-dropdown" id="start-year">
-          <option value="">Year</option>
-        </select>
+  <div id="CalculatorContainer"></div>
+
+  <script>
+    // Create and inject scoped CSS
+    const css = `
+      #CalculatorContainer { 
+        background: #f9f6ee;
+        padding: 40px 0;
+        min-height: 100vh;
+        box-sizing: border-box;
+      }
+      
+      #CalculatorContainer .dc-card { 
+        background: #f9f6ee; 
+        border-radius: 12px; 
+        box-shadow: 0 2px 12px rgba(0,0,0,0.1); 
+        padding: 30px 25px; 
+        width: calc(100% - 20px); 
+        max-width: 425px;
+        margin: 0 auto;
+        box-sizing: border-box;
+      }
+      
+      #CalculatorContainer .dc-title { 
+        font-size: 2.1rem; 
+        color: #553a4d; 
+        font-weight: bold; 
+        margin-bottom: 30px; 
+        letter-spacing: -1px;
+      }
+      
+      #CalculatorContainer .dc-label { 
+        color: #af6b35; 
+        font-weight: 600; 
+        font-size: 1.05rem; 
+        margin-bottom: 8px; 
+        display: block;
+      }
+      
+      #CalculatorContainer .dc-daterow { 
+        margin-bottom: 20px;
+      }
+      
+      #CalculatorContainer .dc-row { 
+        display: flex; 
+        gap: 10px; 
+        margin-bottom: 10px;
+      }
+      
+      #CalculatorContainer .dc-dropdown { 
+        padding: 12px 10px; 
+        border: 1px solid #e6dfd0; 
+        border-radius: 6px; 
+        font-size: 1rem; 
+        outline: none; 
+        width: 100%; 
+        background: #fff; 
+        color: #222;
+        box-sizing: border-box;
+        height: 46px;
+      }
+      
+      #CalculatorContainer .dc-dropdown:focus { 
+        border-color: #af6b35;
+      }
+      
+      #CalculatorContainer .dc-btns { 
+        display: flex; 
+        gap: 12px; 
+        margin: 25px 0 15px 0;
+      }
+      
+      #CalculatorContainer .dc-calc-btn { 
+        background: #b43a22; 
+        color: #fff; 
+        font-weight: bold; 
+        font-size: 1.1rem; 
+        padding: 12px 0; 
+        border: none; 
+        border-radius: 6px; 
+        width: 100%; 
+        cursor: pointer; 
+        transition: background 0.15s; 
+      }
+      
+      #CalculatorContainer .dc-calc-btn:hover { 
+        background: #98301e; 
+      }
+      
+      #CalculatorContainer .dc-reset-btn { 
+        background: #dfcda7; 
+        color: #885b23; 
+        font-weight: bold; 
+        font-size: 1.1rem; 
+        padding: 12px 0; 
+        border: none; 
+        border-radius: 6px; 
+        width: 100%; 
+        cursor: pointer; 
+        transition: background 0.15s;
+      }
+      
+      #CalculatorContainer .dc-reset-btn:hover { 
+        background: #e8e0c5; 
+      }
+      
+      #CalculatorContainer .dc-error { 
+        color: #b43a22; 
+        background: #fff5ef; 
+        padding: 12px 15px; 
+        border-radius: 6px; 
+        font-weight: bold; 
+        margin-bottom: 15px;
+        font-size: 0.95rem;
+      }
+      
+      #CalculatorContainer .dc-results { 
+        background: #fff; 
+        padding: 18px 20px 16px; 
+        border-radius: 8px; 
+        border: 1px solid #eee4c9; 
+        margin-top: 15px;
+      }
+      
+      #CalculatorContainer .dc-results .dc-reslabel { 
+        color: #b43a22; 
+        font-weight: bold; 
+        margin-bottom: 12px; 
+        font-size: 1.1rem;
+        line-height: 1.4;
+      }
+      
+      #CalculatorContainer .dc-units { 
+        display: flex; 
+        gap: 10px; 
+        flex-wrap: wrap; 
+        margin-top: 10px;
+      }
+      
+      #CalculatorContainer .dc-unit { 
+        background: #f0ece5; 
+        padding: 10px 15px; 
+        border-radius: 5px; 
+        font-size: 1rem; 
+        color: #3a3030;
+        flex-grow: 1;
+        text-align: center;
+      }
+
+      /* Mobile-specific styles */
+      @media (max-width: 600px) {
+        #CalculatorContainer {
+          padding: 20px 0;
+        }
+        
+        #CalculatorContainer .dc-card {
+          padding: 25px 15px;
+          width: calc(100% - 30px);
+        }
+        
+        #CalculatorContainer .dc-title {
+          font-size: 1.8rem;
+          margin-bottom: 25px;
+        }
+        
+        #CalculatorContainer .dc-row {
+          flex-direction: column;
+          gap: 8px;
+        }
+        
+        #CalculatorContainer .dc-dropdown {
+          height: 50px;
+          font-size: 1.05rem;
+        }
+        
+        #CalculatorContainer .dc-btns {
+          flex-direction: column;
+          gap: 10px;
+        }
+        
+        #CalculatorContainer .dc-unit {
+          min-width: calc(50% - 15px);
+        }
+      }
+
+      @media (max-width: 400px) {
+        #CalculatorContainer .dc-card {
+          padding: 20px 12px;
+        }
+        
+        #CalculatorContainer .dc-title {
+          font-size: 1.6rem;
+        }
+        
+        #CalculatorContainer .dc-unit {
+          min-width: 100%;
+        }
+      }
+    `;
+
+    const style = document.createElement('style');
+    style.innerHTML = css;
+    document.head.appendChild(style);
+
+    // Create and inject HTML
+    const html = `
+      <div class="dc-card">
+        <h1 class="dc-title">Day Calculator</h1>
+        <div class="dc-daterow">
+          <label class="dc-label">Start Date</label>
+          <div class="dc-row">
+            <select class="dc-dropdown" id="start-month">
+              <option value="">Month</option>
+              <option value="1">January</option>
+              <option value="2">February</option>
+              <option value="3">March</option>
+              <option value="4">April</option>
+              <option value="5">May</option>
+              <option value="6">June</option>
+              <option value="7">July</option>
+              <option value="8">August</option>
+              <option value="9">September</option>
+              <option value="10">October</option>
+              <option value="11">November</option>
+              <option value="12">December</option>
+            </select>
+            <select class="dc-dropdown" id="start-day">
+              <option value="">Day</option>
+            </select>
+            <select class="dc-dropdown" id="start-year">
+              <option value="">Year</option>
+            </select>
+          </div>
+        </div>
+        <div class="dc-daterow">
+          <label class="dc-label">End Date</label>
+          <div class="dc-row">
+            <select class="dc-dropdown" id="end-month">
+              <option value="">Month</option>
+              <option value="1">January</option>
+              <option value="2">February</option>
+              <option value="3">March</option>
+              <option value="4">April</option>
+              <option value="5">May</option>
+              <option value="6">June</option>
+              <option value="7">July</option>
+              <option value="8">August</option>
+              <option value="9">September</option>
+              <option value="10">October</option>
+              <option value="11">November</option>
+              <option value="12">December</option>
+            </select>
+            <select class="dc-dropdown" id="end-day">
+              <option value="">Day</option>
+            </select>
+            <select class="dc-dropdown" id="end-year">
+              <option value="">Year</option>
+            </select>
+          </div>
+        </div>
+        <div id="dc-error" class="dc-error" style="display:none;"></div>
+        <div class="dc-btns">
+          <button class="dc-calc-btn" id="dc-calc-btn">Calculate Duration</button>
+          <button class="dc-reset-btn" id="dc-reset-btn">Clear</button>
+        </div>
+        <div class="dc-results" id="dc-results" style="display:none;">
+          <div class="dc-reslabel" id="dc-result-label"></div>
+          <div class="dc-units">
+            <div class="dc-unit" id="dc-days"></div>
+            <div class="dc-unit" id="dc-weeks"></div>
+            <div class="dc-unit" id="dc-months"></div>
+            <div class="dc-unit" id="dc-years"></div>
+          </div>
+        </div>
       </div>
-    </div>
-    <div class="dc-daterow">
-      <label class="dc-label">End Date</label>
-      <div class="dc-row">
-        <select class="dc-dropdown" id="end-month">
-          <option value="">Month</option>
-          <option value="1">January</option><option value="2">February</option><option value="3">March</option>
-          <option value="4">April</option><option value="5">May</option><option value="6">June</option>
-          <option value="7">July</option><option value="8">August</option><option value="9">September</option>
-          <option value="10">October</option><option value="11">November</option><option value="12">December</option>
-        </select>
-        <select class="dc-dropdown" id="end-day">
-          <option value="">Day</option>
-        </select>
-        <select class="dc-dropdown" id="end-year">
-          <option value="">Year</option>
-        </select>
-      </div>
-    </div>
-    <div id="dc-error" class="dc-error" style="display:none;"></div>
-    <div class="dc-btns">
-      <button class="dc-calc-btn" id="dc-calc-btn">Calculate Duration</button>
-      <button class="dc-reset-btn" id="dc-reset-btn">Clear</button>
-    </div>
-    <div class="dc-results" id="dc-results" style="display:none;">
-      <div class="dc-reslabel" id="dc-result-label"></div>
-      <div class="dc-units">
-        <div class="dc-unit" id="dc-days"></div>
-        <div class="dc-unit" id="dc-weeks"></div>
-        <div class="dc-unit" id="dc-months"></div>
-        <div class="dc-unit" id="dc-years"></div>
-      </div>
-    </div>
-  </div>
-</div>
+    `;
 
-<script>
-(function() {
-  function isLeap(year) {
-    year = Number(year);
-    return year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
-  }
+    document.getElementById('CalculatorContainer').innerHTML = html;
+  </script>
 
-  function daysInMonth(m, y) {
-    m = Number(m); y = Number(y);
-    if (!m || !y) return 31; // Default, so all days always available until chosen
-    if (m === 2) return isLeap(y) ? 29 : 28;
-    if ([4,6,9,11].includes(m)) return 30;
-    return 31;
-  }
+  <script>
+    // Calculator functionality
+    (function() {
+      function isLeap(year) {
+        year = Number(year);
+        return year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
+      }
 
-  function fillYears(select) {
-    const thisYear = (new Date()).getFullYear();
-    for (let y = thisYear - 100; y <= thisYear + 10; y++) {
-      let opt = document.createElement('option');
-      opt.value = y; opt.textContent = y;
-      select.appendChild(opt);
-    }
-  }
+      function daysInMonth(m, y) {
+        m = Number(m); y = Number(y);
+        if (!m || !y) return 31;
+        if (m === 2) return isLeap(y) ? 29 : 28;
+        if ([4,6,9,11].includes(m)) return 30;
+        return 31;
+      }
 
-  function fillDays(select, m, y) {
-    let prev = select.value;
-    select.innerHTML = '<option value="">Day</option>';
-    let dmax = daysInMonth(m, y);
-    for (let d = 1; d <= dmax; d++) {
-      let opt = document.createElement('option');
-      opt.value = d; opt.textContent = d;
-      select.appendChild(opt);
-    }
-    if (prev && prev <= dmax) select.value = prev;
-  }
+      function fillYears(select) {
+        const thisYear = (new Date()).getFullYear();
+        for (let y = thisYear - 100; y <= thisYear + 10; y++) {
+          let opt = document.createElement('option');
+          opt.value = y; 
+          opt.textContent = y;
+          select.appendChild(opt);
+        }
+      }
 
-  // Bind dynamic day updates on change
-  function setupDateRow(row) {
-  let mSel = document.getElementById(row + '-month');
-  let dSel = document.getElementById(row + '-day');
-  let ySel = document.getElementById(row + '-year');
-  fillDays(dSel);      // Initially fill 1-31 days
-  fillYears(ySel);
-  
-  function updateDays() {
-    // Always show days per month WITHOUT considering year for this step:
-    let month = Number(mSel.value);
-    let dayCount;
-    if (month === 2) {
-      dayCount = 29; // Always 29 days for Feb
-    } else if ([4,6,9,11].includes(month)) {
-      dayCount = 30;
-    } else {
-      dayCount = 31;
-    }
-    
-    let prev = dSel.value;
-    dSel.innerHTML = '<option value="">Day</option>';
-    for (let d=1; d<=dayCount; d++) {
-      let opt = document.createElement('option');
-      opt.value = d;
-      opt.textContent = d;
-      dSel.appendChild(opt);
-    }
-    
-    if (prev && prev <= dayCount) {
-      dSel.value = prev;
-    } else {
-      dSel.value = '';
-    }
-  }
-  
-  mSel.addEventListener('change', updateDays);
-  // NOTE: We DO NOT attach updateDays listener on year change, so day dropdown doesn't change when year changes
-}
+      function fillDays(select, m, y) {
+        let prev = select.value;
+        select.innerHTML = '<option value="">Day</option>';
+        let dmax = daysInMonth(m, y);
+        for (let d = 1; d <= dmax; d++) {
+          let opt = document.createElement('option');
+          opt.value = d; 
+          opt.textContent = d;
+          select.appendChild(opt);
+        }
+        if (prev && prev <= dmax) select.value = prev;
+      }
 
-  setupDateRow('start');
-  setupDateRow('end');
+      function setupDateRow(row) {
+        const mSel = document.getElementById(row + '-month');
+        const dSel = document.getElementById(row + '-day');
+        const ySel = document.getElementById(row + '-year');
+        
+        fillDays(dSel);
+        fillYears(ySel);
+        
+        function updateDays() {
+          const month = Number(mSel.value);
+          const year = Number(ySel.value);
+          const dayCount = daysInMonth(month, year);
+          
+          let prev = dSel.value;
+          dSel.innerHTML = '<option value="">Day</option>';
+          for (let d = 1; d <= dayCount; d++) {
+            let opt = document.createElement('option');
+            opt.value = d;
+            opt.textContent = d;
+            dSel.appendChild(opt);
+          }
+          
+          if (prev && prev <= dayCount) {
+            dSel.value = prev;
+          }
+        }
+        
+        mSel.addEventListener('change', updateDays);
+        ySel.addEventListener('change', updateDays);
+      }
 
-  function showError(msg) {
-    let er = document.getElementById('dc-error');
-    er.style.display = '';
-    er.textContent = msg;
-    document.getElementById('dc-results').style.display = 'none';
-  }
-  function hideError() { document.getElementById('dc-error').style.display = 'none'; }
-  function clearAll() {
-    ['start','end'].forEach(prefix => {
-      document.getElementById(`${prefix}-month`).value = '';
-      fillDays(document.getElementById(`${prefix}-day`));
-      document.getElementById(`${prefix}-day`).value = '';
-      document.getElementById(`${prefix}-year`).value = '';
-    });
-    hideError();
-    document.getElementById('dc-results').style.display = 'none';
-  }
+      function showError(msg) {
+        const er = document.getElementById('dc-error');
+        er.style.display = 'block';
+        er.textContent = msg;
+        document.getElementById('dc-results').style.display = 'none';
+      }
+      
+      function hideError() { 
+        document.getElementById('dc-error').style.display = 'none'; 
+      }
+      
+      function clearAll() {
+        ['start','end'].forEach(prefix => {
+          document.getElementById(`${prefix}-month`).value = '';
+          document.getElementById(`${prefix}-day`).innerHTML = '<option value="">Day</option>';
+          document.getElementById(`${prefix}-year`).value = '';
+        });
+        hideError();
+        document.getElementById('dc-results').style.display = 'none';
+      }
 
-  function isValidDate(y,m,d) {
-    if (!y||!m||!d) return false;
-    const date = new Date(y, m-1, d);
-    return (date.getFullYear() == y && date.getMonth() == m-1 && date.getDate() == Number(d));
-  }
+      function isValidDate(y, m, d) {
+        if (!y || !m || !d) return false;
+        const date = new Date(y, m-1, d);
+        return (date.getFullYear() == y && date.getMonth() == m-1 && date.getDate() == Number(d));
+      }
 
-  function calculate() {
-    hideError();
-    let sm = document.getElementById('start-month').value;
-    let sd = document.getElementById('start-day').value;
-    let sy = document.getElementById('start-year').value;
-    let em = document.getElementById('end-month').value;
-    let ed = document.getElementById('end-day').value;
-    let ey = document.getElementById('end-year').value;
+      function calculate() {
+        hideError();
+        const sm = document.getElementById('start-month').value;
+        const sd = document.getElementById('start-day').value;
+        const sy = document.getElementById('start-year').value;
+        const em = document.getElementById('end-month').value;
+        const ed = document.getElementById('end-day').value;
+        const ey = document.getElementById('end-year').value;
 
-    if (!sm||!sd||!sy||!em||!ed||!ey) {
-      showError('Please select all fields for both dates.');
-      return;
-    }
-    if (!isValidDate(sy, sm, sd)) {
-      showError('Invalid start date. (e.g. February 29 in a non-leap year, April 31, etc.)');
-      return;
-    }
-    if (!isValidDate(ey, em, ed)) {
-      showError('Invalid end date. (e.g. February 29 in a non-leap year, April 31, etc.)');
-      return;
-    }
-    let startDate = new Date(sy, sm-1, sd);
-    let endDate = new Date(ey, em-1, ed);
-    if (endDate < startDate) {
-      showError('End date must be after start date.');
-      return;
-    }
+        if (!sm || !sd || !sy || !em || !ed || !ey) {
+          showError('Please select all fields for both dates.');
+          return;
+        }
+        if (!isValidDate(sy, sm, sd)) {
+          showError('Invalid start date. (e.g. February 29 in a non-leap year, April 31, etc.)');
+          return;
+        }
+        if (!isValidDate(ey, em, ed)) {
+          showError('Invalid end date. (e.g. February 29 in a non-leap year, April 31, etc.)');
+          return;
+        }
+        
+        const startDate = new Date(sy, sm-1, sd);
+        const endDate = new Date(ey, em-1, ed);
+        
+        if (endDate < startDate) {
+          showError('End date must be after start date.');
+          return;
+        }
 
-    const diffTime = endDate - startDate;
-    const diffDays = Math.round(diffTime / (1000*60*60*24));
-    const diffWeeks = Math.round((diffDays/7)*10)/10;
-    const diffMonths = Math.round((diffDays/30.44)*10)/10;
-    const diffYears = Math.round((diffDays/365.25)*10)/10;
-    const sdf = startDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
-    const edf = endDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+        const diffTime = Math.abs(endDate - startDate);
+        const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+        const diffWeeks = Math.round((diffDays / 7) * 10) / 10;
+        const diffMonths = Math.round((diffDays / 30.44) * 10) / 10;
+        const diffYears = Math.round((diffDays / 365.25) * 10) / 10;
+        
+        const sdf = startDate.toLocaleDateString('en-US', { 
+          month: 'long', 
+          day: 'numeric', 
+          year: 'numeric' 
+        });
+        
+        const edf = endDate.toLocaleDateString('en-US', { 
+          month: 'long', 
+          day: 'numeric', 
+          year: 'numeric' 
+        });
 
-    document.getElementById('dc-results').style.display = '';
-    document.getElementById('dc-result-label').textContent = `Between ${sdf} and ${edf}`;
-    document.getElementById('dc-days').textContent = `${diffDays} day${diffDays !== 1 ? 's':''}`;
-    document.getElementById('dc-weeks').textContent = `${diffWeeks} week${diffWeeks !== 1 ? 's':''}`;
-    document.getElementById('dc-months').textContent = `${diffMonths} month${diffMonths !== 1 ? 's':''}`;
-    document.getElementById('dc-years').textContent = `${diffYears} year${diffYears !== 1 ? 's':''}`;
-  }
+        const results = document.getElementById('dc-results');
+        results.style.display = 'block';
+        document.getElementById('dc-result-label').textContent = `Between ${sdf} and ${edf}`;
+        document.getElementById('dc-days').textContent = `${diffDays} day${diffDays !== 1 ? 's' : ''}`;
+        document.getElementById('dc-weeks').textContent = `${diffWeeks} week${diffWeeks !== 1 ? 's' : ''}`;
+        document.getElementById('dc-months').textContent = `${diffMonths} month${diffMonths !== 1 ? 's' : ''}`;
+        document.getElementById('dc-years').textContent = `${diffYears} year${diffYears !== 1 ? 's' : ''}`;
+      }
 
-  document.getElementById('dc-calc-btn').onclick = calculate;
-  document.getElementById('dc-reset-btn').onclick = clearAll;
-})();
-</script>
+      // Initialize
+      setupDateRow('start');
+      setupDateRow('end');
+      document.getElementById('dc-calc-btn').addEventListener('click', calculate);
+      document.getElementById('dc-reset-btn').addEventListener('click', clearAll);
+    })();
+  </script>
 </body>
 </html>
