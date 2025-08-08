@@ -443,8 +443,29 @@
       // Initialize
       setupDateRow('start');
       setupDateRow('end');
-      document.getElementById('dc-calc-btn').addEventListener('click', calculate);
-      document.getElementById('dc-reset-btn').addEventListener('click', clearAll);
+      function setDefaultDates() {
+  const today = new Date();
+  const weekFromNow = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
+
+  // Helper to set selects by prefix (start or end) and a JS Date object
+  function setDate(prefix, dateObj) {
+    document.getElementById(`${prefix}-year`).value = dateObj.getFullYear();
+    document.getElementById(`${prefix}-month`).value = dateObj.getMonth() + 1;
+    // Since filling days depends on month/year, wait and then set day:
+    setTimeout(() => {
+      document.getElementById(`${prefix}-day`).value = dateObj.getDate();
+    }, 0); // Run after days drop-down is populated
+  }
+
+  setDate('start', today);
+  setDate('end', weekFromNow);
+}
+
+     setupDateRow('start');
+setupDateRow('end');
+setDefaultDates();
+document.getElementById('dc-calc-btn').addEventListener('click', calculate);
+document.getElementById('dc-reset-btn').addEventListener('click', clearAll);
     })();
   </script>
 </body>
