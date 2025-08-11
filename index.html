@@ -6,19 +6,20 @@
   <title>Day Calculator</title>
 </head>
 <body>
-  <div id="CalculatorContainer"></div>
+  <div id="DayCalculatorContainer"></div>
 
   <script>
     // Create and inject scoped CSS
     const css = `
-      #CalculatorContainer { 
+      #DayCalculatorContainer { 
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
         background: #f9f6ee;
         padding: 40px 0;
         min-height: 100vh;
         box-sizing: border-box;
       }
       
-      #CalculatorContainer .dc-card { 
+      #DayCalculatorContainer .dc-card { 
         background: #f9f6ee; 
         border-radius: 12px; 
         box-shadow: 0 2px 12px rgba(0,0,0,0.1); 
@@ -29,15 +30,16 @@
         box-sizing: border-box;
       }
       
-      #CalculatorContainer .dc-title { 
+      #DayCalculatorContainer h1.dc-title { 
         font-size: 2.1rem; 
         color: #553a4d; 
         font-weight: bold; 
         margin-bottom: 30px; 
         letter-spacing: -1px;
+        line-height: 1.2;
       }
       
-      #CalculatorContainer .dc-label { 
+      #DayCalculatorContainer .dc-label { 
         color: #af6b35; 
         font-weight: 600; 
         font-size: 1.05rem; 
@@ -45,17 +47,17 @@
         display: block;
       }
       
-      #CalculatorContainer .dc-daterow { 
+      #DayCalculatorContainer .dc-daterow { 
         margin-bottom: 20px;
       }
       
-      #CalculatorContainer .dc-row { 
+      #DayCalculatorContainer .dc-row { 
         display: flex; 
         gap: 10px; 
         margin-bottom: 10px;
       }
       
-      #CalculatorContainer .dc-dropdown { 
+      #DayCalculatorContainer select.dc-dropdown { 
         padding: 12px 10px; 
         border: 1px solid #e6dfd0; 
         border-radius: 6px; 
@@ -66,19 +68,26 @@
         color: #222;
         box-sizing: border-box;
         height: 46px;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+        background-size: 16px;
       }
       
-      #CalculatorContainer .dc-dropdown:focus { 
+      #DayCalculatorContainer select.dc-dropdown:focus { 
         border-color: #af6b35;
       }
       
-      #CalculatorContainer .dc-btns { 
+      #DayCalculatorContainer .dc-btns { 
         display: flex; 
         gap: 12px; 
         margin: 25px 0 15px 0;
       }
       
-      #CalculatorContainer .dc-calc-btn { 
+      #DayCalculatorContainer button.dc-calc-btn { 
         background: #b43a22; 
         color: #fff; 
         font-weight: bold; 
@@ -91,11 +100,11 @@
         transition: background 0.15s; 
       }
       
-      #CalculatorContainer .dc-calc-btn:hover { 
+      #DayCalculatorContainer button.dc-calc-btn:hover { 
         background: #98301e; 
       }
       
-      #CalculatorContainer .dc-reset-btn { 
+      #DayCalculatorContainer button.dc-reset-btn { 
         background: #dfcda7; 
         color: #885b23; 
         font-weight: bold; 
@@ -108,11 +117,11 @@
         transition: background 0.15s;
       }
       
-      #CalculatorContainer .dc-reset-btn:hover { 
+      #DayCalculatorContainer button.dc-reset-btn:hover { 
         background: #e8e0c5; 
       }
       
-      #CalculatorContainer .dc-error { 
+      #DayCalculatorContainer .dc-error { 
         color: #b43a22; 
         background: #fff5ef; 
         padding: 12px 15px; 
@@ -122,7 +131,7 @@
         font-size: 0.95rem;
       }
       
-      #CalculatorContainer .dc-results { 
+      #DayCalculatorContainer .dc-results { 
         background: #fff; 
         padding: 18px 20px 16px; 
         border-radius: 8px; 
@@ -130,7 +139,7 @@
         margin-top: 15px;
       }
       
-      #CalculatorContainer .dc-results .dc-reslabel { 
+      #DayCalculatorContainer .dc-results .dc-reslabel { 
         color: #b43a22; 
         font-weight: bold; 
         margin-bottom: 12px; 
@@ -138,14 +147,14 @@
         line-height: 1.4;
       }
       
-      #CalculatorContainer .dc-units { 
+      #DayCalculatorContainer .dc-units { 
         display: flex; 
         gap: 10px; 
         flex-wrap: wrap; 
         margin-top: 10px;
       }
       
-      #CalculatorContainer .dc-unit { 
+      #DayCalculatorContainer .dc-unit { 
         background: #f0ece5; 
         padding: 10px 15px; 
         border-radius: 5px; 
@@ -153,54 +162,55 @@
         color: #3a3030;
         flex-grow: 1;
         text-align: center;
+        min-width: calc(50% - 20px);
       }
 
       /* Mobile-specific styles */
       @media (max-width: 600px) {
-        #CalculatorContainer {
+        #DayCalculatorContainer {
           padding: 20px 0;
         }
         
-        #CalculatorContainer .dc-card {
+        #DayCalculatorContainer .dc-card {
           padding: 25px 15px;
           width: calc(100% - 30px);
         }
         
-        #CalculatorContainer .dc-title {
+        #DayCalculatorContainer h1.dc-title {
           font-size: 1.8rem;
           margin-bottom: 25px;
         }
         
-        #CalculatorContainer .dc-row {
+        #DayCalculatorContainer .dc-row {
           flex-direction: column;
           gap: 8px;
         }
         
-        #CalculatorContainer .dc-dropdown {
+        #DayCalculatorContainer select.dc-dropdown {
           height: 50px;
           font-size: 1.05rem;
         }
         
-        #CalculatorContainer .dc-btns {
+        #DayCalculatorContainer .dc-btns {
           flex-direction: column;
           gap: 10px;
         }
         
-        #CalculatorContainer .dc-unit {
+        #DayCalculatorContainer .dc-unit {
           min-width: calc(50% - 15px);
         }
       }
 
       @media (max-width: 400px) {
-        #CalculatorContainer .dc-card {
+        #DayCalculatorContainer .dc-card {
           padding: 20px 12px;
         }
         
-        #CalculatorContainer .dc-title {
+        #DayCalculatorContainer h1.dc-title {
           font-size: 1.6rem;
         }
         
-        #CalculatorContainer .dc-unit {
+        #DayCalculatorContainer .dc-unit {
           min-width: 100%;
         }
       }
@@ -283,7 +293,7 @@
       </div>
     `;
 
-    document.getElementById('CalculatorContainer').innerHTML = html;
+    document.getElementById('DayCalculatorContainer').innerHTML = html;
   </script>
 
   <script>
@@ -441,31 +451,27 @@
       }
 
       // Initialize
+      function setDefaultDates() {
+        const today = new Date();
+        const weekFromNow = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
+
+        function setDate(prefix, dateObj) {
+          document.getElementById(`${prefix}-year`).value = dateObj.getFullYear();
+          document.getElementById(`${prefix}-month`).value = dateObj.getMonth() + 1;
+          setTimeout(() => {
+            document.getElementById(`${prefix}-day`).value = dateObj.getDate();
+          }, 0);
+        }
+
+        setDate('start', today);
+        setDate('end', weekFromNow);
+      }
+
       setupDateRow('start');
       setupDateRow('end');
-      function setDefaultDates() {
-  const today = new Date();
-  const weekFromNow = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
-
-  // Helper to set selects by prefix (start or end) and a JS Date object
-  function setDate(prefix, dateObj) {
-    document.getElementById(`${prefix}-year`).value = dateObj.getFullYear();
-    document.getElementById(`${prefix}-month`).value = dateObj.getMonth() + 1;
-    // Since filling days depends on month/year, wait and then set day:
-    setTimeout(() => {
-      document.getElementById(`${prefix}-day`).value = dateObj.getDate();
-    }, 0); // Run after days drop-down is populated
-  }
-
-  setDate('start', today);
-  setDate('end', weekFromNow);
-}
-
-     setupDateRow('start');
-setupDateRow('end');
-setDefaultDates();
-document.getElementById('dc-calc-btn').addEventListener('click', calculate);
-document.getElementById('dc-reset-btn').addEventListener('click', clearAll);
+      setDefaultDates();
+      document.getElementById('dc-calc-btn').addEventListener('click', calculate);
+      document.getElementById('dc-reset-btn').addEventListener('click', clearAll);
     })();
   </script>
 </body>
